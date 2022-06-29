@@ -14,7 +14,7 @@ import javafx.stage.Window;
 import java.io.IOException;
 import java.time.LocalDate;
 
-public class TurnierErstellenGUIController {
+public class TurnierErstellenController {
 
     @FXML Label lbUeberschrift;
 
@@ -26,9 +26,10 @@ public class TurnierErstellenGUIController {
     @FXML Button btBestaetigen;
     @FXML Button btAbbrechen;
 
-   private Turnier turnier;
+    private Turnier turnier;
 
     public Turnier showDialog(Stage stage, Window window) throws IOException {
+
         FXMLLoader fxmlLoader = new FXMLLoader(TurnierUndTeilnehmerGUI.class.getResource("TurnierErstellenGUI.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Hello!");
@@ -48,7 +49,6 @@ public class TurnierErstellenGUIController {
 
     @FXML
     protected void onBtAbbrechenClick() {
-        turnier = null;
         Stage stage = (Stage) lbUeberschrift.getScene().getWindow();
         stage.close();
     }
