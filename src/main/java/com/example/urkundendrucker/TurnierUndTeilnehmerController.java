@@ -1,7 +1,6 @@
 package com.example.urkundendrucker;
 
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
@@ -47,9 +46,12 @@ public class TurnierUndTeilnehmerController {
     private TextField tfLaufzeit;
 
     @FXML
-    private Label lblLaufzeit;
+    private Label lblPlatzierung;
 
     private Turnier turnier = null;
+
+    private boolean editierenProcessOngoing = false;
+    private Teilnehmer teilnehmerBeingEditiert;
 
     public void initialize() {
 
@@ -63,6 +65,7 @@ public class TurnierUndTeilnehmerController {
         tcLaufzeit.setCellValueFactory(new PropertyValueFactory<>("laufzeit"));
         tcPlatzierung.setCellValueFactory(new PropertyValueFactory<>("platzierung"));
         tbTeilnehmertabelle.setPlaceholder(new Label("keine Teilnehmer vorhanden"));
+
 
         tfLaufzeit.setPromptText("Zeit");
         tfVollerName.setPromptText("Voller Name");
@@ -123,35 +126,109 @@ public class TurnierUndTeilnehmerController {
 
     @FXML
     protected void onTNErstellenClick() {
-        if (turnier != null && tfLaufzeit.getText() != "" && tfVollerName.getText() != "") {
-            try {
-                Teilnehmer teilnehmer = new Teilnehmer(tfVollerName.getText(), turnier, Double.valueOf(tfLaufzeit.getText()));
-                tfLaufzeit.setText("");
-                tfVollerName.setText("");
-                tbTeilnehmertabelle.getItems().add(teilnehmer);
-                turnier.berechnePlatzierung();
-                tbTeilnehmertabelle.refresh();
-            } catch (Exception e) {
-                //TODO add Error Message
-            }
+        if(editierenProcessOngoing) {
 
+            lblPlatzierung.setText("");
+            tfLaufzeit.setText("");
+            tfVollerName.setText("");
+            btTNErstellen.setText("TN Erstellen");
+            btTNEditieren.setText("TN Editieren");
+
+            btTNLoeschen.setDisable(false);
+            btSpeichern.setDisable(false);
+            btDrucken.setDisable(false);
+            btLaden.setDisable(false);
+            btSpeichern.setDisable(false);
+            btNeuesTurnier.setDisable(false);
+
+            editierenProcessOngoing = false;
+
+        } else {
+            if (turnier != null && tfLaufzeit.getText() != "" && tfVollerName.getText() != "") {
+                try {
+                    Teilnehmer teilnehmer = new Teilnehmer(tfVollerName.getText(), turnier, Double.valueOf(tfLaufzeit.getText()));
+                    tfLaufzeit.setText("");
+                    tfVollerName.setText("");
+                    tbTeilnehmertabelle.getItems().add(teilnehmer);
+                    turnier.berechnePlatzierung();
+                    tbTeilnehmertabelle.refresh();
+                } catch (Exception e) {
+                    //TODO add Error Message
+                }
+            }
         }
         System.out.println("TNErstellenButtonPressed");
+
     }
 
     @FXML
     protected void onBtTNEditierenClick() {
-        Teilnehmer teilnehmer = (Teilnehmer) tbTeilnehmertabelle.getSelectionModel().getSelectedItem();
-        if(teilnehmer != null) {
-            try{
 
-            } catch (Exception e) {
+        if(!editierenProcessOngoing) {
 
+            Teilnehmer teilnehmer = (Teilnehmer) tbTeilnehmertabelle.getSelectionModel().getSelectedItem();
+            if(teilnehmer != null) {
+                try{
+                    teilnehmerBeingEditiert = teilnehmer;
+
+                    editierenProcessOngoing = true;
+
+                    btTNLoeschen.setDisable(true);
+                    btSpeichern.setDisable(true);
+                    btDrucken.setDisable(true);
+                    btLaden.setDisable(true);
+                    btSpeichern.setDisable(true);
+                    btNeuesTurnier.setDisable(true);
+
+                    btTNEditieren.setText("Fertig");
+                    btTNErstellen.setText("Abbrechen");
+
+                    tfVollerName.setText(teilnehmer.getVollerName());
+                    tfLaufzeit.setText(teilnehmer.getLaufzeit() + "");
+                    lblPlatzierung.setText(teilnehmer.getPlatzierung() + "");
+
+                } catch (Exception e) {
+
+                }
+            }
+        } else {
+            if(tfLaufzeit.getText() != "" && tfVollerName.getText() != "") {
+                if (turnier != null && tfLaufzeit.getText() != "" && tfVollerName.getText() != "") {
+                    try {
+                        Teilnehmer teilnehmer = new Teilnehmer(tfVollerName.getText(), turnier, Double.valueOf(tfLaufzeit.getText()));
+
+                        tbTeilnehmertabelle.getItems().remove(teilnehmerBeingEditiert);
+                        tbTeilnehmertabelle.getItems().add(teilnehmer);
+                        turnier.getTeilnehmerListe().remove(teilnehmerBeingEditiert);
+                        turnier.berechnePlatzierung();
+                        tbTeilnehmertabelle.refresh();
+
+                        lblPlatzierung.setText("");
+                        tfLaufzeit.setText("");
+                        tfVollerName.setText("");
+                        btTNErstellen.setText("TN Erstellen");
+                        btTNEditieren.setText("TN Editieren");
+
+                        btTNLoeschen.setDisable(false);
+                        btSpeichern.setDisable(false);
+                        btDrucken.setDisable(false);
+                        btLaden.setDisable(false);
+                        btSpeichern.setDisable(false);
+                        btNeuesTurnier.setDisable(false);
+
+                        editierenProcessOngoing = false;
+
+                    } catch (Exception e) {
+                        //TODO add Error Message
+                    }
+                }
             }
         }
-
-        System.out.println("tnEditierenButtonPrssed");
     }
+
+
+
+
 
     @FXML
     protected void onBtTNLoeschenClick() {
