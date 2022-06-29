@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 public class TurnierErstellenController {
 
@@ -43,7 +44,9 @@ public class TurnierErstellenController {
     }
 
     public void initialize() {
-
+        tfTurnierName.setPromptText("Turnier Name");
+        tfSportart.setPromptText("Sportart");
+        dpDatum.setValue(LocalDate.now());
     }
 
     @FXML

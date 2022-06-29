@@ -96,6 +96,12 @@ public class TurnierUndTeilnehmerController {
             btSpeichern.setDisable(false);
             btDrucken.setDisable(false);
 
+            Teilnehmer erwin = new Teilnehmer("Freigraf Erwin Eduard Eckbert der Edle von Eichenteich-Eeilwasser", turnier, 8000.001);
+            Teilnehmer auguste = new Teilnehmer("Freifrau Auguste Adelheit Alberta die Außergewöhnlich zu Augsburg-Aue", turnier, 8000);
+            Teilnehmer felix = new Teilnehmer("Graf Felix von Wolfsburg", turnier, 9500);
+            Teilnehmer gustav = new Teilnehmer("Gutsherr Gustav Gunther Gerald der Große von Gießen-Gutenfels", turnier, 5000);
+
+
             turnier.berechnePlatzierung();
 
             tbTeilnehmertabelle.getItems().clear();
@@ -135,10 +141,13 @@ public class TurnierUndTeilnehmerController {
 
     @FXML
     protected void onBtTNEditierenClick() {
-        try{
+        Teilnehmer teilnehmer = (Teilnehmer) tbTeilnehmertabelle.getSelectionModel().getSelectedItem();
+        if(teilnehmer != null) {
+            try{
 
-        } catch (Exception e) {
+            } catch (Exception e) {
 
+            }
         }
 
         System.out.println("tnEditierenButtonPrssed");
@@ -146,6 +155,19 @@ public class TurnierUndTeilnehmerController {
 
     @FXML
     protected void onBtTNLoeschenClick() {
+        Teilnehmer teilnehmer = (Teilnehmer) tbTeilnehmertabelle.getSelectionModel().getSelectedItem();
+        if(teilnehmer != null) {
+            try{
+                turnier.getTeilnehmerListe().remove(teilnehmer);
+                turnier.berechnePlatzierung();
+                tbTeilnehmertabelle.getItems().remove(teilnehmer);
+                tbTeilnehmertabelle.refresh();
+            } catch (Exception e) {
+
+            }
+        }
+
+
         System.out.println("tnLoeschenButtonPrssed");
     }
 
