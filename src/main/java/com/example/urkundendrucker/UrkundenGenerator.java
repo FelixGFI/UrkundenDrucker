@@ -35,7 +35,7 @@ public class UrkundenGenerator {
 
     }
 
-    private static void createAllUrkunden(ArrayList<Teilnehmer> urkundenListe) throws FileNotFoundException {
+    public static void createAllUrkunden(ArrayList<Teilnehmer> urkundenListe) throws FileNotFoundException {
 
         for (Teilnehmer teilnehmer : urkundenListe) {
             teilnehmer.getTurnier().berechnePlatzierung();
