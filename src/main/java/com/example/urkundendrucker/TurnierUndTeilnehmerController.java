@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class TurnierUndTeilnehmerGUIController {
+public class TurnierUndTeilnehmerController {
     @FXML
     private Label lbUeberschrift;
 
@@ -105,7 +105,6 @@ public class TurnierUndTeilnehmerGUIController {
         }
     }
 
-
     @FXML
     protected void onBtDruckenClick() throws FileNotFoundException {
         if (turnier != null) {
@@ -136,6 +135,12 @@ public class TurnierUndTeilnehmerGUIController {
 
     @FXML
     protected void onBtTNEditierenClick() {
+        try{
+
+        } catch (Exception e) {
+
+        }
+
         System.out.println("tnEditierenButtonPrssed");
     }
 
@@ -158,29 +163,13 @@ public class TurnierUndTeilnehmerGUIController {
         StackPane secondaryLayout = new StackPane();
         secondaryLayout.getChildren().add(new Label("a Lable"));
 
-        Scene secondScene = new Scene(secondaryLayout, 230, 100);
-
-        Stage stage = new Stage();//(Stage) lbUeberschrift.getScene().getWindow();
+        Stage stage = new Stage();
 
         Turnier turnier = TurnierErstellenController.showDialog(stage, lbUeberschrift.getScene().getWindow());
 
         System.out.println(turnier);
 
-        // New window (Stage)
-        /*Stage newWindow = new Stage();
-        newWindow.setTitle("Second Stage");
-        newWindow.setScene(secondScene);
-        Stage stage1 = (Stage) secondScene.getWindow();
-        stage1.initModality(Modality.WINDOW_MODAL);
-        stage1.initOwner(stage);
-        stage1.showAndWait();*/
-
-        // Set position of second window, related to primary window.
-
-
-
         return turnier;
     }
-
 
 }

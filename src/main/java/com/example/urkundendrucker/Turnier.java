@@ -37,7 +37,8 @@ public class Turnier {
 
     @Override
     public String toString() {
-        return  turnierName + " in Sportart " + sportart + " am ";
+        //TODO set German Date Format
+        return  turnierName + " in Sportart " + sportart + " am " + datum;
     }
 
     public Turnier(String turnierName, String sportart, LocalDate datum) {

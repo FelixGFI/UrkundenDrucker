@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
 public class TurnierErstellenController {
 
@@ -30,17 +29,15 @@ public class TurnierErstellenController {
 
     public static Turnier showDialog(Stage stage, Window window) throws IOException {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(TurnierUndTeilnehmerGUI.class.getResource("TurnierErstellenGUI.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(TurnierUndTeilnehmerApplication.class.getResource("TurnierErstellenView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         TurnierErstellenController ctrl = fxmlLoader.getController();
 
-        stage.setTitle("Hello!");
+        stage.setTitle("Turnier Erstellung");
         stage.setScene(scene);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(window);
         stage.showAndWait();
-
-        System.out.println("just before return" + ctrl.turnier);
 
         return ctrl.turnier;
     }
@@ -57,10 +54,15 @@ public class TurnierErstellenController {
 
     @FXML
     protected void onBtBestaetigenClick() {
-        turnier = new Turnier("Regionalmeisterschaften im 100 Meter Lauf Klein Britanien", "100 Meter Sprint", LocalDate.now());
-        System.out.println(turnier);
+        if(tfSportart.getText() != "" && tfTurnierName.getText() != "" && dpDatum.getValue() != null) {
+            try {
+                turnier = new Turnier(tfTurnierName.getText(), tfSportart.getText(), dpDatum.getValue());
+                Stage stage = (Stage) lbUeberschrift.getScene().getWindow();
+                stage.close();
+            } catch (Exception e) {
+                //TODO add Error Message
+            }
+        }
 
-        Stage stage = (Stage) lbUeberschrift.getScene().getWindow();
-        stage.close();
     }
 }
