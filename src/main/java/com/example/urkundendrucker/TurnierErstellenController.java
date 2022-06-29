@@ -28,19 +28,21 @@ public class TurnierErstellenController {
 
     private Turnier turnier;
 
-    public Turnier showDialog(Stage stage, Window window) throws IOException {
+    public static Turnier showDialog(Stage stage, Window window) throws IOException {
 
         FXMLLoader fxmlLoader = new FXMLLoader(TurnierUndTeilnehmerGUI.class.getResource("TurnierErstellenGUI.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        TurnierErstellenController ctrl = fxmlLoader.getController();
+
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(window);
         stage.showAndWait();
 
-        System.out.println("just before return" + turnier);
+        System.out.println("just before return" + ctrl.turnier);
 
-        return turnier;
+        return ctrl.turnier;
     }
 
     public void initialize() {

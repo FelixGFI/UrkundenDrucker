@@ -162,9 +162,7 @@ public class TurnierUndTeilnehmerGUIController {
 
         Stage stage = new Stage();//(Stage) lbUeberschrift.getScene().getWindow();
 
-        TurnierErstellenController turnierErstellenGUIController = new TurnierErstellenController();
-
-        Turnier turnier = turnierErstellenGUIController.showDialog(stage, lbUeberschrift.getScene().getWindow());
+        Turnier turnier = TurnierErstellenController.showDialog(stage, lbUeberschrift.getScene().getWindow());
 
         System.out.println(turnier);
 
