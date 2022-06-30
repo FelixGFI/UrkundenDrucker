@@ -8,7 +8,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.util.List;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -91,10 +92,23 @@ public class TurnierUndTeilnehmerController {
     @FXML
     protected void onBtNeuesTurnierClick() throws IOException {
         //TODO create warning "Alle ungespeicherten Daten werden verworfen"
-        //TODO add Dialog to create Turnier
         turnier = createTurnierInNewWindow();
         if(turnier != null) {
 
+
+
+            Teilnehmer erwin = new Teilnehmer("Freigraf Erwin Eduard Eckbert der Edle von Eichenteich-Eeilwasser", turnier, 8000.001);
+            Teilnehmer auguste = new Teilnehmer("Freifrau Auguste Adelheit Alberta die Außergewöhnlich zu Augsburg-Aue", turnier, 8000);
+            Teilnehmer felix = new Teilnehmer("Graf Felix von Wolfsburg", turnier, 9500);
+            Teilnehmer gustav = new Teilnehmer("Gutsherr Gustav Gunther Gerald der Große von Gießen-Gutenfels", turnier, 5000);
+
+            showTurnierInTabelView();
+
+        }
+    }
+
+    private void showTurnierInTabelView() {
+        if(turnier != null) {
             lbUeberschrift.setText("Teilnehmerliste zu " + turnier.getTurnierName());
 
             btTNLoeschen.setDisable(false);
@@ -103,18 +117,13 @@ public class TurnierUndTeilnehmerController {
             btSpeichern.setDisable(false);
             btDrucken.setDisable(false);
 
-            Teilnehmer erwin = new Teilnehmer("Freigraf Erwin Eduard Eckbert der Edle von Eichenteich-Eeilwasser", turnier, 8000.001);
-            Teilnehmer auguste = new Teilnehmer("Freifrau Auguste Adelheit Alberta die Außergewöhnlich zu Augsburg-Aue", turnier, 8000);
-            Teilnehmer felix = new Teilnehmer("Graf Felix von Wolfsburg", turnier, 9500);
-            Teilnehmer gustav = new Teilnehmer("Gutsherr Gustav Gunther Gerald der Große von Gießen-Gutenfels", turnier, 5000);
-
-
             turnier.berechnePlatzierung();
 
             tbTeilnehmertabelle.getItems().clear();
-            tbTeilnehmertabelle.getItems().addAll(turnier.getTeilnehmerListe());
+            if(turnier.getTeilnehmerListe() != null) {
+                tbTeilnehmertabelle.getItems().addAll(turnier.getTeilnehmerListe());
+            }
             tbTeilnehmertabelle.refresh();
-
         }
     }
 
@@ -243,7 +252,7 @@ public class TurnierUndTeilnehmerController {
                 tbTeilnehmertabelle.getItems().remove(teilnehmer);
                 tbTeilnehmertabelle.refresh();
             } catch (Exception e) {
-
+                //TODO Error Message
             }
         }
 
@@ -254,7 +263,7 @@ public class TurnierUndTeilnehmerController {
     @FXML
     protected void onBtSpeichernClick() throws IOException {
         if(turnier != null) {
-            File file = chooseFile();
+            File file = chooseFile(true);
             try {
                 FileWriter fileWriter = new FileWriter(file);
                 CSVWriter csvWriter = new CSVWriter(fileWriter);
@@ -262,6 +271,13 @@ public class TurnierUndTeilnehmerController {
                 String[] toWriteTurnierData = {turnier.getTurnierName(), turnier.getSportart(), turnier.getDatum() + ""};
 
                 csvWriter.writeNext(toWriteTurnierData);
+
+                if(!turnier.getTeilnehmerListe().isEmpty() && turnier.getTeilnehmerListe() != null) {
+                    for (Teilnehmer teilnehmer: turnier.getTeilnehmerListe()) {
+                        String[] toWriteTeilnehmerData = {teilnehmer.getVollerName(), teilnehmer.getLaufzeit() + ""};
+                        csvWriter.writeNext(toWriteTeilnehmerData);
+                    }
+                }
 
                 csvWriter.close();
             } catch (IOException e) {
@@ -274,25 +290,48 @@ public class TurnierUndTeilnehmerController {
     @FXML
     protected void onBtLadenClick() throws IOException {
 
-        File file = chooseFile();
+        File file = chooseFile(false);
         FileReader fileReader = new FileReader(file);
         CSVReader csvReader = new CSVReader(fileReader);
 
-        String[] toReadTurnierData;
-        toReadTurnierData = csvReader.readNext();
-        System.out.println(Arrays.toString(toReadTurnierData));
+        List<String[]> dataList = csvReader.readAll();
 
-        while ((toReadTurnierData = csvReader.readNext()) != null) {
-            if (toReadTurnierData != null) {
-                //Verifying the read data here
-                System.out.println(Arrays.toString(toReadTurnierData));
+        if(!dataList.isEmpty() && dataList != null) {
+
+            boolean turnierErfolgreichErstellt = false;
+
+            for (String[] data : dataList) {
+                if(dataList.indexOf(data) == 0) {
+                    turnierErfolgreichErstellt = createTurnierFromStringArrayData(data);
+                } else {
+                    if(turnierErfolgreichErstellt) {
+                        createTeilnehmerFromStringArrayDataAndAddToTurnier(data);
+                    }
+                }
             }
+            if(turnierErfolgreichErstellt) {
+                showTurnierInTabelView();
+            }
+        }
+    }
 
+    private boolean createTurnierFromStringArrayData(String[] turnierData) {
+        boolean turnerErfolgreichErstellt = false;
+        try{
+            turnier = new Turnier(turnierData[0], turnierData[1], LocalDate.parse(turnierData[2]));
+            turnerErfolgreichErstellt = true;
+        } catch (Exception e) {
+            //TODO fehlermeldung
+        }
+        return turnerErfolgreichErstellt;
+    }
 
+    private void createTeilnehmerFromStringArrayDataAndAddToTurnier(String[] teilnehmerData) {
+        try{
+            Teilnehmer teilnehmer = new Teilnehmer(teilnehmerData[0], turnier, Double.parseDouble(teilnehmerData[1]));
+        } catch (Exception e) {
 
-            csvReader.close();
-
-            System.out.println("LadenButtonPrssed");
+            //TODO fehlermeldung
         }
     }
 
@@ -309,7 +348,7 @@ public class TurnierUndTeilnehmerController {
         return turnier;
     }
 
-    private File chooseFile() throws IOException {
+    private File chooseFile(boolean methodeAufgerufenUmDatenZuspeichern) throws IOException {
 
         FileChooser fileChooserDat = new FileChooser();
         File defaultPath = new File("src/urkundenOrdner");
@@ -320,15 +359,13 @@ public class TurnierUndTeilnehmerController {
 
         Stage stage = (Stage) lbUeberschrift.getScene().getWindow();
 
-
-
-        File file = fileChooserDat.showOpenDialog(stage);;
-
-        //fileChooserDat.setInitialDirectory(new File(file.getParent()));
-
+        File file;
+        if(methodeAufgerufenUmDatenZuspeichern) {
+            file = fileChooserDat.showSaveDialog(stage);
+        } else {
+            file = fileChooserDat.showOpenDialog(stage);
+        }
         return file;
-
-
     }
 
 }
