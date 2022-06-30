@@ -120,7 +120,7 @@ public class TurnierUndTeilnehmerController {
             turnier.berechnePlatzierung();
 
             tbTeilnehmertabelle.getItems().clear();
-            if(turnier.getTeilnehmerListe() != null) {
+            if(turnier.getTeilnehmerListe() != null && !turnier.getTeilnehmerListe().isEmpty()) {
                 tbTeilnehmertabelle.getItems().addAll(turnier.getTeilnehmerListe());
             }
             tbTeilnehmertabelle.refresh();
@@ -160,7 +160,7 @@ public class TurnierUndTeilnehmerController {
             editierenProcessOngoing = false;
 
         } else {
-            if (turnier != null && tfLaufzeit.getText() != "" && tfVollerName.getText() != "") {
+            if (turnier != null && !tfLaufzeit.getText().equals("") && !tfVollerName.getText().equals("")) {
                 try {
                     Teilnehmer teilnehmer = new Teilnehmer(tfVollerName.getText(), turnier, Double.valueOf(tfLaufzeit.getText()));
                     tfLaufzeit.setText("");
@@ -204,12 +204,12 @@ public class TurnierUndTeilnehmerController {
                     lblPlatzierung.setText(teilnehmer.getPlatzierung() + "");
 
                 } catch (Exception e) {
-
+                    //TODO Fehlermeldung
                 }
             }
         } else {
-            if(tfLaufzeit.getText() != "" && tfVollerName.getText() != "") {
-                if (turnier != null && tfLaufzeit.getText() != "" && tfVollerName.getText() != "") {
+            if(!tfLaufzeit.getText().equals("") && !tfVollerName.getText().equals("")) {
+                if (turnier != null &&! tfLaufzeit.getText().equals("") && !tfVollerName.getText().equals("")) {
                     try {
                         Teilnehmer teilnehmer = new Teilnehmer(tfVollerName.getText(), turnier, Double.valueOf(tfLaufzeit.getText()));
 
@@ -261,7 +261,7 @@ public class TurnierUndTeilnehmerController {
     }
 
     @FXML
-    protected void onBtSpeichernClick() throws IOException {
+    protected void onBtSpeichernClick() {
         if(turnier != null) {
             File file = chooseFile(true);
             try {
@@ -296,7 +296,7 @@ public class TurnierUndTeilnehmerController {
 
         List<String[]> dataList = csvReader.readAll();
 
-        if(!dataList.isEmpty() && dataList != null) {
+        if(!dataList.isEmpty()) {
 
             boolean turnierErfolgreichErstellt = false;
 
@@ -328,6 +328,7 @@ public class TurnierUndTeilnehmerController {
 
     private void createTeilnehmerFromStringArrayDataAndAddToTurnier(String[] teilnehmerData) {
         try{
+            //the Variable teilnehmer IS NECCESERRY !DO NOT DELETE! the constructor of Class Teilnehmer atomaticaly adds the Teilnehmer to the given Turniers Teilnehmerliste
             Teilnehmer teilnehmer = new Teilnehmer(teilnehmerData[0], turnier, Double.parseDouble(teilnehmerData[1]));
         } catch (Exception e) {
 
@@ -348,7 +349,7 @@ public class TurnierUndTeilnehmerController {
         return turnier;
     }
 
-    private File chooseFile(boolean methodeAufgerufenUmDatenZuspeichern) throws IOException {
+    private File chooseFile(boolean methodeAufgerufenUmDatenZuspeichern) {
 
         FileChooser fileChooserDat = new FileChooser();
         File defaultPath = new File("src/urkundenOrdner");
