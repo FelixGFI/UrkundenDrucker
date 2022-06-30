@@ -44,6 +44,11 @@
             <version>7.1.17</version>
             <type>pom</type>
         </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.1</version>
+        </dependency>
     </dependencies>
 
     <build>

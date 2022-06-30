@@ -4,10 +4,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.util.Arrays;
+
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 public class TurnierUndTeilnehmerController {
     @FXML
@@ -116,6 +120,9 @@ public class TurnierUndTeilnehmerController {
 
     @FXML
     protected void onBtDruckenClick() throws FileNotFoundException {
+
+        //TODO add Feature to Print only specific Teilnehmer Urkunden (Select Multiple, Only activate TN Editieren Button wenn only a single Teilnehmer is ausgewählt
+
         if (turnier != null) {
             turnier.berechnePlatzierung();
             UrkundenGenerator.createAllUrkunden(turnier.getTeilnehmerListe());
@@ -226,10 +233,6 @@ public class TurnierUndTeilnehmerController {
         }
     }
 
-
-
-
-
     @FXML
     protected void onBtTNLoeschenClick() {
         Teilnehmer teilnehmer = (Teilnehmer) tbTeilnehmertabelle.getSelectionModel().getSelectedItem();
@@ -249,13 +252,48 @@ public class TurnierUndTeilnehmerController {
     }
 
     @FXML
-    protected void onBtSpeichernClick() {
+    protected void onBtSpeichernClick() throws IOException {
+        if(turnier != null) {
+            File file = chooseFile();
+            try {
+                FileWriter fileWriter = new FileWriter(file);
+                CSVWriter csvWriter = new CSVWriter(fileWriter);
+
+                String[] toWriteTurnierData = {turnier.getTurnierName(), turnier.getSportart(), turnier.getDatum() + ""};
+
+                csvWriter.writeNext(toWriteTurnierData);
+
+                csvWriter.close();
+            } catch (IOException e) {
+                //TODO Print error Message
+            }
+        }
         System.out.println("speichernPrssed");
     }
 
     @FXML
-    protected void onBtLadenClick() {
-        System.out.println("LadenButtonPrssed");
+    protected void onBtLadenClick() throws IOException {
+
+        File file = chooseFile();
+        FileReader fileReader = new FileReader(file);
+        CSVReader csvReader = new CSVReader(fileReader);
+
+        String[] toReadTurnierData;
+        toReadTurnierData = csvReader.readNext();
+        System.out.println(Arrays.toString(toReadTurnierData));
+
+        while ((toReadTurnierData = csvReader.readNext()) != null) {
+            if (toReadTurnierData != null) {
+                //Verifying the read data here
+                System.out.println(Arrays.toString(toReadTurnierData));
+            }
+
+
+
+            csvReader.close();
+
+            System.out.println("LadenButtonPrssed");
+        }
     }
 
     protected Turnier createTurnierInNewWindow() throws IOException {
@@ -269,6 +307,28 @@ public class TurnierUndTeilnehmerController {
         System.out.println(turnier);
 
         return turnier;
+    }
+
+    private File chooseFile() throws IOException {
+
+        FileChooser fileChooserDat = new FileChooser();
+        File defaultPath = new File("src/urkundenOrdner");
+        fileChooserDat.setInitialDirectory(defaultPath);
+        fileChooserDat.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+        );
+
+        Stage stage = (Stage) lbUeberschrift.getScene().getWindow();
+
+
+
+        File file = fileChooserDat.showOpenDialog(stage);;
+
+        //fileChooserDat.setInitialDirectory(new File(file.getParent()));
+
+        return file;
+
+
     }
 
 }
