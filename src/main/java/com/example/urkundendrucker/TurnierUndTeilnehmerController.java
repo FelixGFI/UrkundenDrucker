@@ -365,7 +365,7 @@ public class TurnierUndTeilnehmerController {
     private File chooseFile(boolean methodeAufgerufenUmDatenZuspeichern) {
 
         FileChooser fileChooserDat = new FileChooser();
-        File defaultPath = new File("src/urkundenOrdner");
+        File defaultPath = new File("src/turnierOrdner");
         fileChooserDat.setInitialDirectory(defaultPath);
         fileChooserDat.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("CSV Files", "*.csv")
