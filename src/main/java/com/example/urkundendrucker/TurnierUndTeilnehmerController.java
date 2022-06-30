@@ -1,18 +1,24 @@
 package com.example.urkundendrucker;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import javafx.stage.StageStyle;
 
 public class TurnierUndTeilnehmerController {
     @FXML
@@ -91,20 +97,27 @@ public class TurnierUndTeilnehmerController {
 
     @FXML
     protected void onBtNeuesTurnierClick() throws IOException {
-        //TODO create warning "Alle ungespeicherten Daten werden verworfen"
-        turnier = createTurnierInNewWindow();
-        if(turnier != null) {
+
+
+        if(erzeugeConfirmationAlert("WARNUNG", "WARNUNG:", "ungespeicherte Daten gehen verloren") || turnier == null) {
+            turnier = createTurnierInNewWindow();
+            if(turnier != null) {
 
 
 
-            Teilnehmer erwin = new Teilnehmer("Freigraf Erwin Eduard Eckbert der Edle von Eichenteich-Eeilwasser", turnier, 8000.001);
-            Teilnehmer auguste = new Teilnehmer("Freifrau Auguste Adelheit Alberta die Außergewöhnlich zu Augsburg-Aue", turnier, 8000);
-            Teilnehmer felix = new Teilnehmer("Graf Felix von Wolfsburg", turnier, 9500);
-            Teilnehmer gustav = new Teilnehmer("Gutsherr Gustav Gunther Gerald der Große von Gießen-Gutenfels", turnier, 5000);
+                Teilnehmer erwin = new Teilnehmer("Freigraf Erwin Eduard Eckbert der Edle von Eichenteich-Eeilwasser", turnier, 8000.001);
+                Teilnehmer auguste = new Teilnehmer("Freifrau Auguste Adelheit Alberta die Außergewöhnlich zu Augsburg-Aue", turnier, 8000);
+                Teilnehmer felix = new Teilnehmer("Graf Felix von Wolfsburg", turnier, 9500);
+                Teilnehmer gustav = new Teilnehmer("Gutsherr Gustav Gunther Gerald der Große von Gießen-Gutenfels", turnier, 5000);
 
-            showTurnierInTabelView();
+                showTurnierInTabelView();
 
+            }
         }
+
+
+
+
     }
 
     private void showTurnierInTabelView() {
@@ -135,7 +148,6 @@ public class TurnierUndTeilnehmerController {
         if (turnier != null) {
             turnier.berechnePlatzierung();
             UrkundenGenerator.createAllUrkunden(turnier.getTeilnehmerListe());
-            System.out.println("DruckenButtonPressed");
         }
 
     }
@@ -169,12 +181,13 @@ public class TurnierUndTeilnehmerController {
                     turnier.berechnePlatzierung();
                     tbTeilnehmertabelle.refresh();
                 } catch (Exception e) {
-                    //TODO add Error Message
+                    erzeugeInformationAlert("Erstellen Fehlgeschlagen", "Teilnehmer konnte nicht erstellt werden", "Bitte füllen Sie alle Felder korrekt aus");
                 }
+            } else {
+                erzeugeInformationAlert("Erstellen Fehlgeschlagen", "Teilnehmer konnte nicht erstellt werden", "Bitte füllen Sie alle Felder korrekt aus");
+
             }
         }
-        System.out.println("TNErstellenButtonPressed");
-
     }
 
     @FXML
@@ -204,8 +217,10 @@ public class TurnierUndTeilnehmerController {
                     lblPlatzierung.setText(teilnehmer.getPlatzierung() + "");
 
                 } catch (Exception e) {
-                    //TODO Fehlermeldung
+                    erzeugeInformationAlert("Editieren Fehlgeschalgen", "Bei Editieren ist ein Fehler aufgetreten", "Bitte Versuchen Sie es erneut");
                 }
+            } else {
+                erzeugeInformationAlert("Editieren Fehlgeschalgen", "Bei Editieren ist ein Fehler aufgetreten", "Bitte Versuchen Sie es erneut");
             }
         } else {
             if(!tfLaufzeit.getText().equals("") && !tfVollerName.getText().equals("")) {
@@ -235,7 +250,7 @@ public class TurnierUndTeilnehmerController {
                         editierenProcessOngoing = false;
 
                     } catch (Exception e) {
-                        //TODO add Error Message
+                        erzeugeInformationAlert("Editieren Fehlgeschlagen", "Teilnehmer konnte nicht Angepasst werden", "Bitte überprüfen sie das alle Felder korrekt ausgefüllt ist");
                     }
                 }
             }
@@ -252,12 +267,9 @@ public class TurnierUndTeilnehmerController {
                 tbTeilnehmertabelle.getItems().remove(teilnehmer);
                 tbTeilnehmertabelle.refresh();
             } catch (Exception e) {
-                //TODO Error Message
+                erzeugeInformationAlert("Löschen Fehlsgeschlagen", "Löschen Fehlgeschlagen", "Teilnehmer konnte nicht gelöscht werden.");
             }
         }
-
-
-        System.out.println("tnLoeschenButtonPrssed");
     }
 
     @FXML
@@ -281,36 +293,40 @@ public class TurnierUndTeilnehmerController {
 
                 csvWriter.close();
             } catch (IOException e) {
-                //TODO Print error Message
+                erzeugeInformationAlert("Speichern Fehlgeschalgen", "Speichern Fehlgeschalgen", "Beim Speichern ist ein Fehler aufgetreten. Bitte Überprüfen Sie die Sinnhaftigkeit der eingegebenen Daten und versuchen Sie es erneut.");
             }
+        } else {
+            erzeugeInformationAlert("kein Turnier", "kein Turnier gefunden", "Es ist kein Turnier vorhanden das Gespeichert werden kann");
         }
-        System.out.println("speichernPrssed");
     }
 
     @FXML
     protected void onBtLadenClick() throws IOException {
 
-        File file = chooseFile(false);
-        FileReader fileReader = new FileReader(file);
-        CSVReader csvReader = new CSVReader(fileReader);
+        if(erzeugeConfirmationAlert("WARNUNG", "WARNUNG:", "ungespeicherte Daten gehen verloren") || turnier == null) {
 
-        List<String[]> dataList = csvReader.readAll();
+            File file = chooseFile(false);
+            FileReader fileReader = new FileReader(file);
+            CSVReader csvReader = new CSVReader(fileReader);
 
-        if(!dataList.isEmpty()) {
+            List<String[]> dataList = csvReader.readAll();
 
-            boolean turnierErfolgreichErstellt = false;
+            if(!dataList.isEmpty()) {
 
-            for (String[] data : dataList) {
-                if(dataList.indexOf(data) == 0) {
-                    turnierErfolgreichErstellt = createTurnierFromStringArrayData(data);
-                } else {
-                    if(turnierErfolgreichErstellt) {
-                        createTeilnehmerFromStringArrayDataAndAddToTurnier(data);
+                boolean turnierErfolgreichErstellt = false;
+
+                for (String[] data : dataList) {
+                    if(dataList.indexOf(data) == 0) {
+                        turnierErfolgreichErstellt = createTurnierFromStringArrayData(data);
+                    } else {
+                        if(turnierErfolgreichErstellt) {
+                            createTeilnehmerFromStringArrayDataAndAddToTurnier(data);
+                        }
                     }
                 }
-            }
-            if(turnierErfolgreichErstellt) {
-                showTurnierInTabelView();
+                if(turnierErfolgreichErstellt) {
+                    showTurnierInTabelView();
+                }
             }
         }
     }
@@ -321,7 +337,7 @@ public class TurnierUndTeilnehmerController {
             turnier = new Turnier(turnierData[0], turnierData[1], LocalDate.parse(turnierData[2]));
             turnerErfolgreichErstellt = true;
         } catch (Exception e) {
-            //TODO fehlermeldung
+            erzeugeInformationAlert("Laden Fehlgeschlagen", "Laden Fehlgeschlagen", "Turnier konnte nicht ausgelesen werden");
         }
         return turnerErfolgreichErstellt;
     }
@@ -331,8 +347,7 @@ public class TurnierUndTeilnehmerController {
             //the Variable teilnehmer IS NECCESERRY !DO NOT DELETE! the constructor of Class Teilnehmer atomaticaly adds the Teilnehmer to the given Turniers Teilnehmerliste
             Teilnehmer teilnehmer = new Teilnehmer(teilnehmerData[0], turnier, Double.parseDouble(teilnehmerData[1]));
         } catch (Exception e) {
-
-            //TODO fehlermeldung
+            erzeugeInformationAlert("Ladefehler", "Ladefehler", "Ein oder mehrere Teilnehmer konnten nicht geladen werden");
         }
     }
 
@@ -343,8 +358,6 @@ public class TurnierUndTeilnehmerController {
         Stage stage = new Stage();
 
         Turnier turnier = TurnierErstellenController.showDialog(stage, lbUeberschrift.getScene().getWindow());
-
-        System.out.println(turnier);
 
         return turnier;
     }
@@ -367,6 +380,61 @@ public class TurnierUndTeilnehmerController {
             file = fileChooserDat.showOpenDialog(stage);
         }
         return file;
+    }
+
+    protected boolean erzeugeConfirmationAlert(String titel, String header, String text) {
+
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+
+        a.setTitle(titel);
+        a.setHeaderText(header);
+        a.setContentText(text);
+
+        a.getButtonTypes().clear();
+        a.getButtonTypes().add(ButtonType.OK);
+        a.getButtonTypes().add(ButtonType.CANCEL);
+
+        Optional<ButtonType> optional = a.showAndWait();
+
+        if(optional.get() == null) {
+            return false;
+        } else if (optional.get() == ButtonType.OK) {
+            return true;
+        } else if (optional.get() == ButtonType.CANCEL) {
+            return false;
+        } else {
+            return false;
+        }
+    }
+
+    protected void erzeugeInformationAlert(String titel, String header, String text) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+
+
+        a.setTitle(titel);
+        a.setHeaderText(header);
+        a.setContentText(text);
+
+        // replace old scene root with placeholder to allow using root in other Scene
+        DialogPane root = a.getDialogPane();
+        root.getScene().setRoot(new Group());
+        root.setPadding(new Insets(10, 0, 10, 0));
+        Scene scene = new Scene(root);
+        Stage dialogStage = new Stage(StageStyle.UTILITY);
+        dialogStage.setScene(scene);
+
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setAlwaysOnTop(true);
+        dialogStage.setResizable(false);
+
+
+        ButtonBase button = (ButtonBase) root.lookupButton(ButtonType.OK);
+        ButtonBase button2 = (ButtonBase) root.lookupButton(ButtonType.CANCEL);
+        button.setOnAction(evt -> {
+            dialogStage.close();
+        });
+
+        dialogStage.showAndWait();
     }
 
 }

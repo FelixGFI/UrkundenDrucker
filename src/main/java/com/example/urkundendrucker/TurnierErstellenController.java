@@ -57,15 +57,17 @@ public class TurnierErstellenController {
 
     @FXML
     protected void onBtBestaetigenClick() {
+        TurnierUndTeilnehmerController cntr = new TurnierUndTeilnehmerController();
         if(tfSportart.getText() != "" && tfTurnierName.getText() != "" && dpDatum.getValue() != null) {
             try {
                 turnier = new Turnier(tfTurnierName.getText(), tfSportart.getText(), dpDatum.getValue());
                 Stage stage = (Stage) lbUeberschrift.getScene().getWindow();
                 stage.close();
             } catch (Exception e) {
-                //TODO add Error Message
+                cntr.erzeugeInformationAlert("Erstellen Fehlgeschlagen", "Turnier Erstellung Fehlgeschlagen", "Bitte Stellen Sie sicher das alle Felder korrekt ausgefüllt sind");
             }
+        } else {
+            cntr.erzeugeInformationAlert("Erstellen Fehlgeschlagen", "Turnier Erstellung Fehlgeschlagen", "Bitte Stellen Sie sicher das alle Felder korrekt ausgefüllt sind");
         }
-
     }
 }
